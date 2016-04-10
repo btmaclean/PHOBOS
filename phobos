@@ -1,0 +1,236 @@
+#!/usr/local/bin/python
+
+#-------------- PHOBOS ---------------------------#
+#-- Phobos will determine spectroscopic parameters based on the EWs in the moog_input file.
+#-- Required subscripts for Phobos to run are fe_phobos, parameter_phobos, elementa;_phobos, model_phobos, and moog_phobos. Please ensure all 4 scripts are in $PATH, as Phobos will call them from the working directory.
+
+#-- Load modules that may be required.
+import numpy as np
+import os
+import shutil
+import sys
+import subprocess
+from moog_phobos import moog
+from model_phobos import model
+from ares_phobos import ares
+from param_summary_phobos import psum
+from create_photom_params_phobos import create_photom_params
+
+scriptloc = os.path.dirname(sys.argv[0])
+
+#-- Load use defined variables: location, linelists and text editor.
+execfile('{}/user_variables.py'.format(scriptloc))
+
+def pyclean(scriptloc):
+	if os.path.exists('{}/ares_phobos.pyc'.format(scriptloc)):
+		os.remove('{}/ares_phobos.pyc'.format(scriptloc))
+	if os.path.exists('{}/model_phobos.pyc'.format(scriptloc)):
+		os.remove('{}/model_phobos.pyc'.format(scriptloc))
+	if os.path.exists('{}/moog_phobos.pyc'.format(scriptloc)):
+		os.remove('{}/moog_phobos.pyc'.format(scriptloc))
+	if os.path.exists('{}/param_summary_phobos.pyc'.format(scriptloc)):
+		os.remove('{}/param_summary_phobos.pyc'.format(scriptloc))
+	if os.path.exists('{}/create_photom_params_phobos.pyc'.format(scriptloc)):
+		os.remove('{}/create_photom_params_phobos.pyc'.format(scriptloc))
+	return
+
+if not os.path.exists('{}'.format(location)):
+	pyclean(scriptloc)
+	sys.exit('\nAnalysis directory {} does not exist!'.format(location))
+if not os.path.exists('{}'.format(linelist_fe)):
+	pyclean(scriptloc)
+	sys.exit('\nIron line list {} does not exist!'.format(linelist_fe))
+if not os.path.exists('{}'.format(linelist_elements)):
+	pyclean(scriptloc)
+	sys.exit('\nElemental line list {} does not exist!'.format(linelist_elements))
+try:
+	fe_h + 1
+except:
+	pyclean(scriptloc)
+	sys.exit('\nCluster metallicity ([Fe/H]) must be a float.')
+
+print '\nPhobos code files: {}\nAnalysis directory: {}\nIron line list: {}\nElemental line list: {}\nText Editor: {}\nCluster metallicity estimate: [Fe/H] = {}\nCluster distance modulus: {}\nPhotometry colour: {}'.format(scriptloc,location,linelist_fe,linelist_elements,texteditor,fe_h,dist_mod,colour_scale)
+
+#-- Go to analysis directory.
+os.chdir(location)
+
+def purge(location):
+	if os.path.exists('{}/ares'.format(location)):
+		shutil.rmtree('{}/ares'.format(location))
+	if os.path.exists('{}/models'.format(location)):
+		shutil.rmtree('{}/models'.format(location))
+	if os.path.exists('{}/moog_input'.format(location)):
+		shutil.rmtree('{}/moog_input'.format(location))
+	if os.path.exists('{}/moog_out1'.format(location)):
+		shutil.rmtree('{}/moog_out1'.format(location))
+	if os.path.exists('{}/moog_out2'.format(location)):
+		shutil.rmtree('{}/moog_out2'.format(location))
+	if os.path.exists('{}/moog_parameters'.format(location)):
+		shutil.rmtree('{}/moog_parameters'.format(location))
+	if os.path.exists('{}/spectro.params'.format(location)):
+		os.remove('{}/spectro.params'.format(location))
+	return
+
+#-- Ask user which star to use (ie. 1-50).
+star = raw_input('\nPlease specify which number star you would like to Phobos (i.e. 1 to n, where n is the total number of stars): ')
+if star.lower() == 'purge':
+	operation = raw_input('\nAre you sure? [y/N] ')
+	if operation.lower().startswith('y'):
+		operation = raw_input('\nPlease type PURGE (in capitals) to completely purge analysis directory (excluding /fits and /backups folders and photo.params file). ')
+		if operation == 'PURGE':
+			print '\nYour funeral, buddy.'
+			purge(location)
+			pyclean(scriptloc)
+			sys.exit('\nAnalysis directory ({}) purged of all Phobos activity (excluding /backups folder). /fits folder and photo.params file still exist. ')
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos. Did NOT purge.')
+	else:
+		pyclean(scriptloc)
+		sys.exit('\nExiting Phobos')
+try:
+	int(star)
+except:
+	pyclean(scriptloc)
+	sys.exit('\nSelection must be an integer.')
+star = int(star)
+
+#-- Because arrays are stupid and start at zero.
+arrayelement = star - 1
+
+#-- Create photometric parameter list if it doesn't exist yet.
+if not os.path.exists('photo.params'):
+	print 'Creating photo.params from photometry.txt'
+	create_photom_params(location,fe_h,dist_mod,colour_scale)
+
+#-- Create spectroscopic parameter list if it doesn't exist yet.
+if not os.path.exists('spectro.params'):
+	print 'Creating spectro.params from photo.params'
+	shutil.copy('photo.params','spectro.params')
+	
+#-- Read spectro.params as numpy array and use only the details of the star as user defined.
+params = np.genfromtxt('spectro.params',dtype=None)
+name = params[arrayelement][0]
+Teff = int(params[arrayelement][1])
+logg = params[arrayelement][2]
+xi = params[arrayelement][3]
+
+def photoreplace():
+	params = np.genfromtxt('photo.params',dtype=None)
+	name = params[arrayelement][0]
+	Teff = int(params[arrayelement][1])
+	logg = params[arrayelement][2]
+	xi = params[arrayelement][3]
+	model(name,location,Teff,logg,xi,fe_h)
+	params = np.genfromtxt('spectro.params',dtype=None)
+	params[arrayelement][1] = int(Teff)
+	params[arrayelement][2] = logg
+	params[arrayelement][3] = xi
+	np.savetxt('spectro.params', params, fmt='%s')
+	return
+
+def deletestar(name,location,feelements):
+	if os.path.exists('{}/ares/{}.{}.ares'.format(location,name,feelements)):
+		os.remove('{}/ares/{}.{}.ares'.format(location,name,feelements))
+	if os.path.exists('{}/models/{}.model.dat'.format(location,name)):
+		os.remove('{}/models/{}.model.dat'.format(location,name))
+	if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
+		os.remove('{}/moog_input/{}.{}.lines'.format(location,name,feelements))
+	if os.path.exists('{}/moog_out1/{}.out1'.format(location,name)):
+		os.remove('{}/moog_out1/{}.out1'.format(location,name))
+	if os.path.exists('{}/moog_out2/{}.out2'.format(location,name)):
+		os.remove('{}/moog_out2/{}.out2'.format(location,name))
+	if os.path.exists('{}/moog_parameters/{}'.format(location,star)):
+		os.remove('{}/moog_parameters/{}'.format(location,star))
+	if feelements == 'fe':
+		photoreplace()
+	return
+
+#-- Ask user what to do.
+operation = raw_input('\nWhat would you like to do?\n Parameter/Fe analysis [p][f],\n Elemental abundance determination [e],\n Make a new model [m],\n Delete a stellar analysis [del], or\n Purge analysis folder [PURGE]?\n ')
+
+if operation.lower().startswith('f'):
+	print '\nRunning Parameter-Phobos.'
+	feelements = 'fe'
+	execfile('{}/parameter_phobos.py'.format(scriptloc))
+elif operation.lower() == 'p':
+	print '\nRunning Parameter-Phobos.'
+	feelements = 'fe'
+	execfile('{}/parameter_phobos.py'.format(scriptloc))
+elif operation.lower().startswith('e'):
+	print '\nRunning Elemental-Phobos.'
+	feelements = 'elements'
+	execfile('{}/elemental_phobos.py'.format(scriptloc))
+elif operation.lower().startswith('m'):
+	operation = raw_input('\nRemake spectroscopic model [s] or reset to parameters to photometric [p]? ')
+	if operation.lower().startswith('s'):
+		model(name,location,Teff,logg,xi,fe_h)
+		pyclean(scriptloc)
+		sys.exit('\nNew spectroscopic model created for {n} (star {s}).'.format(n=name,s=star))
+	elif operation.lower().startswith('p'):
+		photoreplace()
+		pyclean(scriptloc)
+		sys.exit('\nParameters for {n} (star {s}) reset to photometric, new model created.'.format(n=name,s=star))
+	else:
+		pyclean(scriptloc)
+		sys.exit('\nNot a selection')
+elif operation.lower().startswith('del'):
+	operation = raw_input('\nDelete parameter/fe files [f][p], elemental files [e] or all files [a]? ')
+	if operation.lower().startswith('f'):
+		operation = raw_input('\nAre you sure? [y/N] ')
+		if operation.lower().startswith('y'):
+			deletestar(name,location,'fe')
+			pyclean(scriptloc)
+			sys.exit('\nAll Fe analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe.lines and {n}.fits files still exist.'.format(n=name,s=star))
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos')
+	if operation.lower().startswith('p'):
+		operation = raw_input('\nAre you sure? [y/N] ')
+		if operation.lower().startswith('y'):
+			deletestar(name,location,'fe')
+			pyclean(scriptloc)
+			sys.exit('\nAll Fe analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe.lines and {n}.fits files still exist.'.format(n=name,s=star))
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos')
+	if operation.lower().startswith('e'):
+		operation = raw_input('\nAre you sure? [y/N] ')
+		if operation.lower().startswith('y'):
+			deletestar(name,location,'elements')
+			pyclean(scriptloc)
+			sys.exit('\nAll elemental analysis files for {n} (star {s}) have been deleted. Backup {n}.elements.lines and {n}.fits files still exist.'.format(n=name,s=star))
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos')
+	if operation.lower().startswith('a'):
+		operation = raw_input('\nAre you sure? [y/N] ')
+		if operation.lower().startswith('y'):
+			deletestar(name,location,'fe')
+			deletestar(name,location,'elements')
+			pyclean(scriptloc)
+			sys.exit('\nAll analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe/elements.lines and {n}.fits files still exist.'.format(n=name,s=star))
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos')
+	else:
+		pyclean(scriptloc)
+		sys.exit('\nNot a selection')
+elif operation.lower() == 'purge':
+	operation = raw_input('\nAre you sure? [y/N] ')
+	if operation.lower().startswith('y'):
+		operation = raw_input('\nPlease type PURGE (in capitals) to completely purge analysis directory (excluding /fits and /backups folders and photo.params file). ')
+		if operation == 'PURGE':
+			print '\nYour funeral, buddy.'
+			purge(location)
+			pyclean(scriptloc)
+			sys.exit('\nAnalysis directory ({}) purged of all Phobos activity (excluding /backups folder). /fits folder and photo.params file still exist. ')
+		else:
+			pyclean(scriptloc)
+			sys.exit('\nExiting Phobos. Did NOT purge.')
+	else:
+		pyclean(scriptloc)
+		sys.exit('\nExiting Phobos')
+else:
+	pyclean(scriptloc)
+	sys.exit('\nNot a selection')
