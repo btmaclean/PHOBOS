@@ -1,5 +1,5 @@
 # PHOBOS
--------------------------------------------------------------- INTRODUCTION -------------------------------------------------------------
+-------------------------------------------------------------- INTRODUCTION ------------------------------------------------------------
 
 Phobos is a Python 2.7 pipeline for high-resolution spectroscopic parameter and abundance analysis following the ARES+MOOG analysis
 method (Sousa, 2014; http://adsabs.harvard.edu/abs/2014arXiv1407.5817S).
@@ -10,7 +10,7 @@ values and distances are known).
 
 Written by B. T. Maclean, School of Physics and Astronomy, Monash University, Australia (ben.maclean@monash.edu.au).
 
-#----------------------------------------------------------- REQUIRED SOFTWARE -----------------------------------------------------------
+----------------------------------------------------------- REQUIRED SOFTWARE ----------------------------------------------------------
 
 MOOG (June 2014, http://www.as.utexas.edu/~chris/moog.html)
 -gfortran
@@ -27,7 +27,7 @@ makekurucz3 (*reference?*)
 Python (at least v2.7)
 -numpy
 
-#------------------------------------------------ INSTALLATION / SET-UP (FOLDERS AND FILES) ----------------------------------------------
+------------------------------------------------ INSTALLATION / SET-UP (FOLDERS AND FILES) ---------------------------------------------
 
 1. In the file 'user_variables.py', several strings and values must be defined before Phobos can be used. These include:
 
@@ -60,7 +60,7 @@ Python (at least v2.7)
 5. All Phobos Python files must be in the same directory as the main Phobos file. This directory must be in your PATH environment variable.
    MOOG, ARES and makekurucz3 locations/executables must also be in the PATH environment variable.
 
-#----------------------------------------------------------- USAGE INSTRUCTIONS ----------------------------------------------------------
+----------------------------------------------------------- USAGE INSTRUCTIONS ---------------------------------------------------------
 
 1. MAIN (PHOBOS)
 - When Phobos is run, it will print all the user variables that have been defined. Please check that these are correct before continuing.
@@ -110,10 +110,9 @@ Python (at least v2.7)
 5. FUNCTIONS-PHOBOS
 - This file contains all sub-routines used throughout Phobos.
 
-#------------------------------------------------------------ ACKNOWLEDGEMENTS -----------------------------------------------------------
+------------------------------------------------------------ ACKNOWLEDGEMENTS ----------------------------------------------------------
 
 Thank-you to Chris Sneden who wrote MOOG, Sérgio Sousa who wrote ARES, and the unknown author of makekurucz3.
 Thank-you to my supervisors John Lattanzio, Simon Campbell, and Gayandhi De Silva.
 Thank-you to my wife Grace MacLean-Rizkallah.
 Thank-you to all the others that helped with bits and pieces of Phobos.
-
