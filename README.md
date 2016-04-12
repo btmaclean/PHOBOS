@@ -7,5 +7,6 @@ Originally written to handle globular cluster spectra from the multi-fibre HERME
 Phobos can be easily adapted for data from other high-facilities, or for different stellar targets (where reliable photometric
 values and distances are known).
 
-Written by B. T. Maclean, School of Physics and Astronomy, Monash University, Australia. \\
+Written by B. T. Maclean, School of Physics and Astronomy, Monash University, Australia.
+
 email: ben.maclean@monash.edu.au
