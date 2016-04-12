@@ -1,5 +1,5 @@
 # PHOBOS
-#-------------------------------------------------------------- INTRODUCTION -------------------------------------------------------------
+-------------------------------------------------------------- INTRODUCTION -------------------------------------------------------------
 
 Phobos is a Python 2.7 pipeline for high-resolution spectroscopic parameter and abundance analysis following the ARES+MOOG analysis
 method (Sousa, 2014; http://adsabs.harvard.edu/abs/2014arXiv1407.5817S).
