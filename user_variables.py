@@ -15,7 +15,7 @@ texteditor = 'mate'
 fe_h = -1.15
 #-- Define distance modulus of cluster
 dist_mod = 12.82
-#-- Define colour scale in photometry (options: BV, VK, VJ, VH, by)
+#-- Define colour scale in photometry (options: BV, VJ, VK, VH, by)
 colour_scale = 'BV'
 #--------------- USER TO DEFINE ------------------#
 #-------------------------------------------------#

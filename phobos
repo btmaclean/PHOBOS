@@ -10,29 +10,20 @@ import os
 import shutil
 import sys
 import subprocess
-from moog_phobos import moog
-from model_phobos import model
-from ares_phobos import ares
-from param_summary_phobos import psum
-from create_photom_params_phobos import create_photom_params
+from functions_phobos import moog
+from functions_phobos import model
+from functions_phobos import ares
+from functions_phobos import psum
+from functions_phobos import create_photom_params
+from functions_phobos import pyclean
+from functions_phobos import purge
+from functions_phobos import photoreplace
+from functions_phobos import deletestar
 
 scriptloc = os.path.dirname(sys.argv[0])
 
 #-- Load use defined variables: location, linelists and text editor.
 execfile('{}/user_variables.py'.format(scriptloc))
-
-def pyclean(scriptloc):
-	if os.path.exists('{}/ares_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/ares_phobos.pyc'.format(scriptloc))
-	if os.path.exists('{}/model_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/model_phobos.pyc'.format(scriptloc))
-	if os.path.exists('{}/moog_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/moog_phobos.pyc'.format(scriptloc))
-	if os.path.exists('{}/param_summary_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/param_summary_phobos.pyc'.format(scriptloc))
-	if os.path.exists('{}/create_photom_params_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/create_photom_params_phobos.pyc'.format(scriptloc))
-	return
 
 if not os.path.exists('{}'.format(location)):
 	pyclean(scriptloc)
@@ -54,22 +45,24 @@ print '\nPhobos code files: {}\nAnalysis directory: {}\nIron line list: {}\nElem
 #-- Go to analysis directory.
 os.chdir(location)
 
-def purge(location):
-	if os.path.exists('{}/ares'.format(location)):
-		shutil.rmtree('{}/ares'.format(location))
-	if os.path.exists('{}/models'.format(location)):
-		shutil.rmtree('{}/models'.format(location))
-	if os.path.exists('{}/moog_input'.format(location)):
-		shutil.rmtree('{}/moog_input'.format(location))
-	if os.path.exists('{}/moog_out1'.format(location)):
-		shutil.rmtree('{}/moog_out1'.format(location))
-	if os.path.exists('{}/moog_out2'.format(location)):
-		shutil.rmtree('{}/moog_out2'.format(location))
-	if os.path.exists('{}/moog_parameters'.format(location)):
-		shutil.rmtree('{}/moog_parameters'.format(location))
-	if os.path.exists('{}/spectro.params'.format(location)):
-		os.remove('{}/spectro.params'.format(location))
-	return
+#-- Check for /fits and photometry.txt in analysis directory, and exit if not found.
+if not os.path.exists('{}/fits'.format(location)):
+	pyclean(scriptloc)
+	sys.exit('\n"/fits" folder does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
+
+if not os.path.exists('{}/photometry.txt'.format(location)):
+	pyclean(scriptloc)
+	sys.exit('\n"photometry.txt" does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
+
+#-- Create photometric parameter list if it doesn't exist yet.
+if not os.path.exists('photo.params'):
+	print 'Creating photo.params from photometry.txt'
+	create_photom_params(location,fe_h,dist_mod,colour_scale)
+
+#-- Create spectroscopic parameter list if it doesn't exist yet.
+if not os.path.exists('spectro.params'):
+	print 'Creating spectro.params from photo.params'
+	shutil.copy('photo.params','spectro.params')
 
 #-- Ask user which star to use (ie. 1-50).
 star = raw_input('\nPlease specify which number star you would like to Phobos (i.e. 1 to n, where n is the total number of stars): ')
@@ -97,16 +90,6 @@ star = int(star)
 
 #-- Because arrays are stupid and start at zero.
 arrayelement = star - 1
-
-#-- Create photometric parameter list if it doesn't exist yet.
-if not os.path.exists('photo.params'):
-	print 'Creating photo.params from photometry.txt'
-	create_photom_params(location,fe_h,dist_mod,colour_scale)
-
-#-- Create spectroscopic parameter list if it doesn't exist yet.
-if not os.path.exists('spectro.params'):
-	print 'Creating spectro.params from photo.params'
-	shutil.copy('photo.params','spectro.params')
 	
 #-- Read spectro.params as numpy array and use only the details of the star as user defined.
 params = np.genfromtxt('spectro.params',dtype=None)
@@ -114,37 +97,6 @@ name = params[arrayelement][0]
 Teff = int(params[arrayelement][1])
 logg = params[arrayelement][2]
 xi = params[arrayelement][3]
-
-def photoreplace():
-	params = np.genfromtxt('photo.params',dtype=None)
-	name = params[arrayelement][0]
-	Teff = int(params[arrayelement][1])
-	logg = params[arrayelement][2]
-	xi = params[arrayelement][3]
-	model(name,location,Teff,logg,xi,fe_h)
-	params = np.genfromtxt('spectro.params',dtype=None)
-	params[arrayelement][1] = int(Teff)
-	params[arrayelement][2] = logg
-	params[arrayelement][3] = xi
-	np.savetxt('spectro.params', params, fmt='%s')
-	return
-
-def deletestar(name,location,feelements):
-	if os.path.exists('{}/ares/{}.{}.ares'.format(location,name,feelements)):
-		os.remove('{}/ares/{}.{}.ares'.format(location,name,feelements))
-	if os.path.exists('{}/models/{}.model.dat'.format(location,name)):
-		os.remove('{}/models/{}.model.dat'.format(location,name))
-	if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
-		os.remove('{}/moog_input/{}.{}.lines'.format(location,name,feelements))
-	if os.path.exists('{}/moog_out1/{}.out1'.format(location,name)):
-		os.remove('{}/moog_out1/{}.out1'.format(location,name))
-	if os.path.exists('{}/moog_out2/{}.out2'.format(location,name)):
-		os.remove('{}/moog_out2/{}.out2'.format(location,name))
-	if os.path.exists('{}/moog_parameters/{}'.format(location,star)):
-		os.remove('{}/moog_parameters/{}'.format(location,star))
-	if feelements == 'fe':
-		photoreplace()
-	return
 
 #-- Ask user what to do.
 operation = raw_input('\nWhat would you like to do?\n Parameter/Fe analysis [p][f],\n Elemental abundance determination [e],\n Make a new model [m],\n Delete a stellar analysis [del], or\n Purge analysis folder [PURGE]?\n ')
