@@ -31,7 +31,7 @@ Python (at least v2.7)
 
 1. In the file 'user_variables.py', several strings and values must be defined before Phobos can be used. These include:
 
-   location = 'path/to/analysis-folder'
+   location = 'path/to/analysis-folder'\n
    linelist_fe = 'path/to/iron-line-list'*
    linelist_elements = 'path/to/elemental-line-list'*
    texteditor = 'Terminal command to launch preferred text editor'
