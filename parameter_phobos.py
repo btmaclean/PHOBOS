@@ -372,20 +372,19 @@ if not os.path.exists('backups/'):
 shutil.copy('moog_input/{}.fe.lines'.format(name),'backups/{}.fe.lines'.format(name))
 
 #-- Recreates MOOG parameter with plotting activated.
-with open('moog_parameters/{}'.format(star), 'w') as moog_param_file:
-	moog_param_file.write('abfind\n'\
-	'terminal	 x11\n'\
-	'standard_out \'../moog_out1/{n}.out1\'\n'\
-	'summary_out  \'../moog_out2/{n}.out2\'\n'\
-	'model_in	 \'../models/{n}.model.dat\'\n'\
-	'lines_in	 \'../moog_input/{n}.{fee}.lines\'\n'\
-	'atmosphere 1\n'\
-	'molecules 0\n'\
-	'lines 1\n'\
-	'freeform 1\n'\
-	'flux/int 0\n'\
-	'damping 0\n'\
-	'plot 1'.format(n=name,fee=feelements,plotornot=plotornot))
-
+with open('{}'.format(star), 'w') as moog_param_file:
+    moog_param_file.write('abfind\n'\
+    'terminal     x11\n'\
+    'standard_out \'../moog_out1/{n}.out1\'\n'\
+    'summary_out  \'../moog_out2/{n}.out2\'\n'\
+    'model_in     \'../models/{n}.model.dat\'\n'\
+    'lines_in     \'../moog_input/{n}.{fee}.lines\'\n'\
+    'atmosphere 1\n'\
+    'molecules 0\n'\
+    'lines 1\n'\
+    'freeform 1\n'\
+    'flux/int 0\n'\
+    'damping 0\n'\
+    'plot 1'.format(n=name,fee=feelements,plotornot=plotornot))
 pyclean(scriptloc)
 sys.exit('\nParameter-Phobos has executed for {n} (star {s}), please consider a line check before running Phobos again.'.format(n=name,s=star))

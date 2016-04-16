@@ -120,7 +120,7 @@ elif operation.lower().startswith('m'):
 		pyclean(scriptloc)
 		sys.exit('\nNew spectroscopic model created for {n} (star {s}).'.format(n=name,s=star))
 	elif operation.lower().startswith('p'):
-		photoreplace()
+		photoreplace(name,location,Teff,logg,xi,fe_h,arrayelement)
 		pyclean(scriptloc)
 		sys.exit('\nParameters for {n} (star {s}) reset to photometric, new model created.'.format(n=name,s=star))
 	else:
@@ -131,7 +131,8 @@ elif operation.lower().startswith('del'):
 	if operation.lower().startswith('f'):
 		operation = raw_input('\nAre you sure? [y/N] ')
 		if operation.lower().startswith('y'):
-			deletestar(name,location,'fe')
+			feelements = 'fe'
+			deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement)
 			pyclean(scriptloc)
 			sys.exit('\nAll Fe analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe.lines and {n}.fits files still exist.'.format(n=name,s=star))
 		else:
@@ -140,7 +141,8 @@ elif operation.lower().startswith('del'):
 	if operation.lower().startswith('p'):
 		operation = raw_input('\nAre you sure? [y/N] ')
 		if operation.lower().startswith('y'):
-			deletestar(name,location,'fe')
+			feelements = 'fe'
+			deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement)
 			pyclean(scriptloc)
 			sys.exit('\nAll Fe analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe.lines and {n}.fits files still exist.'.format(n=name,s=star))
 		else:
@@ -149,7 +151,8 @@ elif operation.lower().startswith('del'):
 	if operation.lower().startswith('e'):
 		operation = raw_input('\nAre you sure? [y/N] ')
 		if operation.lower().startswith('y'):
-			deletestar(name,location,'elements')
+			feelements = 'elements'
+			deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement)
 			pyclean(scriptloc)
 			sys.exit('\nAll elemental analysis files for {n} (star {s}) have been deleted. Backup {n}.elements.lines and {n}.fits files still exist.'.format(n=name,s=star))
 		else:
@@ -158,8 +161,10 @@ elif operation.lower().startswith('del'):
 	if operation.lower().startswith('a'):
 		operation = raw_input('\nAre you sure? [y/N] ')
 		if operation.lower().startswith('y'):
-			deletestar(name,location,'fe')
-			deletestar(name,location,'elements')
+			feelements = 'fe'
+			deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement)
+			feelements = 'elements'
+			deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement)
 			pyclean(scriptloc)
 			sys.exit('\nAll analysis files for {n} (star {s}) have been deleted and parameters reset to photometric. Backup {n}.fe/elements.lines and {n}.fits files still exist.'.format(n=name,s=star))
 		else:
@@ -176,7 +181,7 @@ elif operation.lower() == 'purge':
 			print '\nYour funeral, buddy.'
 			purge(location)
 			pyclean(scriptloc)
-			sys.exit('\nAnalysis directory ({}) purged of all Phobos activity (excluding /backups folder). /fits folder and photo.params file still exist. ')
+			sys.exit('\nAnalysis directory ({}) purged of all Phobos activity (excluding /backups folder). /fits folder and photometry.txt file still exist. ')
 		else:
 			pyclean(scriptloc)
 			sys.exit('\nExiting Phobos. Did NOT purge.')

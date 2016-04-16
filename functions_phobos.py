@@ -4,66 +4,69 @@
 #-- Remove temporary *.pyc files from the Phobos location directory.
 def pyclean(scriptloc):
     import os
-	if os.path.exists('{}/functions_phobos.pyc'.format(scriptloc)):
-		os.remove('{}/functions_phobos.pyc'.format(scriptloc))
-	return
+    if os.path.exists('{}/functions_phobos.pyc'.format(scriptloc)):
+        os.remove('{}/functions_phobos.pyc'.format(scriptloc))
+    return
 
 #-------------- PURGE ----------------------------#
 #-- Reset the analysis folder back to the starting point, leaving only the /fits directory, photometry.txt, and any backup files created.
 def purge(location):
     import os
-	if os.path.exists('{}/ares'.format(location)):
-		shutil.rmtree('{}/ares'.format(location))
-	if os.path.exists('{}/models'.format(location)):
-		shutil.rmtree('{}/models'.format(location))
-	if os.path.exists('{}/moog_input'.format(location)):
-		shutil.rmtree('{}/moog_input'.format(location))
-	if os.path.exists('{}/moog_out1'.format(location)):
-		shutil.rmtree('{}/moog_out1'.format(location))
-	if os.path.exists('{}/moog_out2'.format(location)):
-		shutil.rmtree('{}/moog_out2'.format(location))
-	if os.path.exists('{}/moog_parameters'.format(location)):
-		shutil.rmtree('{}/moog_parameters'.format(location))
-	if os.path.exists('{}/spectro.params'.format(location)):
-		os.remove('{}/spectro.params'.format(location))
-	return
+    import shutil
+    if os.path.exists('{}/ares'.format(location)):
+        shutil.rmtree('{}/ares'.format(location))
+    if os.path.exists('{}/models'.format(location)):
+        shutil.rmtree('{}/models'.format(location))
+    if os.path.exists('{}/moog_input'.format(location)):
+        shutil.rmtree('{}/moog_input'.format(location))
+    if os.path.exists('{}/moog_out1'.format(location)):
+        shutil.rmtree('{}/moog_out1'.format(location))
+    if os.path.exists('{}/moog_out2'.format(location)):
+        shutil.rmtree('{}/moog_out2'.format(location))
+    if os.path.exists('{}/moog_parameters'.format(location)):
+        shutil.rmtree('{}/moog_parameters'.format(location))
+    if os.path.exists('{}/spectro.params'.format(location)):
+        os.remove('{}/spectro.params'.format(location))
+    if os.path.exists('{}/photo.params'.format(location)):
+        os.remove('{}/photo.params'.format(location))
+    return
 
 #-------------- PHOTO REPLACE ----------------------------#
 #-- Reset the parameters and model of the star to the initial photometric estimation (from photo.params)
-def photoreplace():
+def photoreplace(name,location,Teff,logg,xi,fe_h,arrayelement):
     import numpy as np
-	params = np.genfromtxt('photo.params',dtype=None)
-	name = params[arrayelement][0]
-	Teff = int(params[arrayelement][1])
-	logg = params[arrayelement][2]
-	xi = params[arrayelement][3]
-	model(name,location,Teff,logg,xi,fe_h)
-	params = np.genfromtxt('spectro.params',dtype=None)
-	params[arrayelement][1] = int(Teff)
-	params[arrayelement][2] = logg
-	params[arrayelement][3] = xi
-	np.savetxt('spectro.params', params, fmt='%s')
-	return
+    params = np.genfromtxt('photo.params',dtype=None)
+    name = params[arrayelement][0]
+    Teff = int(params[arrayelement][1])
+    logg = params[arrayelement][2]
+    xi = params[arrayelement][3]
+    model(name,location,Teff,logg,xi,fe_h)
+    params = np.genfromtxt('spectro.params',dtype=None)
+    params[arrayelement][1] = int(Teff)
+    params[arrayelement][2] = logg
+    params[arrayelement][3] = xi
+    np.savetxt('spectro.params', params, fmt='%s')
+    return
 
 #-------------- DELETE STAR ----------------------------#
 #-- Delete either: i) the iron abundance files and reset parameters to photometric, ii) the elemental abundance files, or iii) all abundance files and reset parameters to photometric.
-def deletestar(name,location,feelements):
+def deletestar(Teff,logg,xi,fe_h,name,location,feelements,star,arrayelement):
     import os
-	if os.path.exists('{}/ares/{}.{}.ares'.format(location,name,feelements)):
-		os.remove('{}/ares/{}.{}.ares'.format(location,name,feelements))
-	if os.path.exists('{}/models/{}.model.dat'.format(location,name)):
-		os.remove('{}/models/{}.model.dat'.format(location,name))
-	if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
-		os.remove('{}/moog_input/{}.{}.lines'.format(location,name,feelements))
-	if os.path.exists('{}/moog_out1/{}.out1'.format(location,name)):
-		os.remove('{}/moog_out1/{}.out1'.format(location,name))
-	if os.path.exists('{}/moog_out2/{}.out2'.format(location,name)):
-		os.remove('{}/moog_out2/{}.out2'.format(location,name))
-	if os.path.exists('{}/moog_parameters/{}'.format(location,star)):
-		os.remove('{}/moog_parameters/{}'.format(location,star))
-	if feelements == 'fe':
-		photoreplace()
-	return
+    if os.path.exists('{}/ares/{}.{}.ares'.format(location,name,feelements)):
+        os.remove('{}/ares/{}.{}.ares'.format(location,name,feelements))
+    if os.path.exists('{}/models/{}.model.dat'.format(location,name)):
+        os.remove('{}/models/{}.model.dat'.format(location,name))
+    if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
+        os.remove('{}/moog_input/{}.{}.lines'.format(location,name,feelements))
+    if os.path.exists('{}/moog_out1/{}.out1'.format(location,name)):
+        os.remove('{}/moog_out1/{}.out1'.format(location,name))
+    if os.path.exists('{}/moog_out2/{}.out2'.format(location,name)):
+        os.remove('{}/moog_out2/{}.out2'.format(location,name))
+    if os.path.exists('{}/moog_parameters/{}'.format(location,star)):
+        os.remove('{}/moog_parameters/{}'.format(location,star))
+    if feelements == 'fe':
+        photoreplace(name,location,Teff,logg,xi,fe_h,arrayelement)
+    return
 
 #-------------- ARES ----------------------------#
 #-- Run star through ARES, and prepares the MOOG input file from the ARES output file and line list.
@@ -303,7 +306,6 @@ def psum(name,Teff,logg,xi):
                 except ValueError:
                     pass
     Iondiff = ablist[0] - ablist[3]
-    fe_h = ablist[0] - 7.5
     psumlist = [EPslope[0],RWslope[0],Iondiff,ablist[0],ablist[1],int(ablist[2]),ablist[3],ablist[4],ablist[5]]
     print 'EP slope = {}'.format(EPslope[0])
     print 'RW slope = {}'.format(RWslope[0])
@@ -311,7 +313,7 @@ def psum(name,Teff,logg,xi):
     print 'Teff = {}'.format(Teff)
     print 'logg = {}'.format(logg)
     print 'xi = {}'.format(xi)
-    print 'FeI = {} +/- {} ({})'.format(fe_h,ablist[1],int(ablist[2]))
+    print 'FeI = {} +/- {} ({})'.format(ablist[0],ablist[1],int(ablist[2]))
     print 'FeII = {} +/- {} ({})'.format(ablist[3],ablist[4],int(ablist[5]))
     return psumlist
 

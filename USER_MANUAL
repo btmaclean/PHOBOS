@@ -1,4 +1,4 @@
---------------------------- PHOBOS README
+--------------------------- PHOBOS USER MANUAL
 
 --------------------------- INTRODUCTION
 
@@ -9,7 +9,8 @@ Originally written to handle globular cluster spectra from the multi-fibre HERME
 Phobos can be easily adapted for data from other high-facilities, or for different stellar targets (where reliable photometric
 values and distances are known).
 
-Written by B. T. Maclean, School of Physics and Astronomy, Monash University, Australia (ben.maclean@monash.edu.au).
+Written by B. T. Maclean, School of Physics and Astronomy, Monash University, Australia. 
+email: ben.maclean@monash.edu.au
 
 --------------------------- REQUIRED SOFTWARE
 
@@ -101,8 +102,8 @@ The analysis directory will be checked for the required fits directory and the p
 - ARES will not be run again unless the /moog_input file is deleted, in which case Fe-Phobos will intialise instead of Parameter-Phobos.
 
 4. ELEMENTAL-PHOBOS
-- The first time 'e' is selected in MAIN, Phobos will run the star through ARES, makekurucz3, and MOOG, using the saved spectroscopic parameters (or photometric if Parameter-Phobos
-  has not been used), and the elemental line-list specified.
+- The first time 'e' is selected in MAIN, Phobos will run the star through ARES, makekurucz3, and MOOG, using the saved spectroscopic parameters
+  (or photometric if Parameter-Phobos has not been used), and the elemental line-list specified.
 - From the second time 'e' is selected in MAIN, Elemental-Phobos will skip ARES, to allow for manual EW remeasurements.
 
 5. USER-VARIABLES
