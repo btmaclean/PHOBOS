@@ -372,7 +372,7 @@ if not os.path.exists('backups/'):
 shutil.copy('moog_input/{}.fe.lines'.format(name),'backups/{}.fe.lines'.format(name))
 
 #-- Recreates MOOG parameter with plotting activated.
-with open('{}'.format(star), 'w') as moog_param_file:
+with open('moog_parameters/{}'.format(star), 'w') as moog_param_file:
     moog_param_file.write('abfind\n'\
     'terminal     x11\n'\
     'standard_out \'../moog_out1/{n}.out1\'\n'\
