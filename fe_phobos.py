@@ -37,6 +37,7 @@ plotornot = 1
 moog(star,name,feelements,location,plotornot)
 
 #-- Opens the moog_output and moog_input line files in chosen.
+subprocess.Popen(['{}'.format(texteditor), '{}'.format(linelist_fe)])
 subprocess.Popen(['{}'.format(texteditor), 'photo.params'])
 subprocess.Popen(['{}'.format(texteditor), 'spectro.params'])
 subprocess.Popen(['{}'.format(texteditor), 'moog_out2/{n}.out2'.format(n=name)])

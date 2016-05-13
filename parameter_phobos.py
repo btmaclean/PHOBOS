@@ -45,6 +45,11 @@ def resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,s
 	model(name,location,Teff,logg,xi,fe_h)
 	plotornot = 1
 	moog(star,name,feelements,location,plotornot)
+	return
+
+Teffbounds = 1000
+xibounds = 1
+loggbounds = 1
 
 #-- MINIMIZE EP slope, RW slope, and Ion Difference by testing varying parameters sequentially until the 3 values are in a minimum range.
 
@@ -54,10 +59,10 @@ def resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,s
 if psumlist[0] <= -0.025:
 	while psumlist[0] <= -0.025:
 		Teff = Teff - 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -68,10 +73,10 @@ if psumlist[0] <= -0.025:
 elif psumlist[0] >= 0.025:
 	while psumlist[0] >= 0.025:
 		Teff = Teff + 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -85,10 +90,10 @@ else: print 'EP slope within tolerance'
 if psumlist[1] <= -0.025:
 	while psumlist[1] <= -0.025:
 		xi = xi - 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -99,9 +104,10 @@ if psumlist[1] <= -0.025:
 elif psumlist[1] >= 0.025:
 	while psumlist[1] >= 0.025:
 		xi = xi + 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -117,10 +123,10 @@ else: print 'RW slope within tolerance'
 if psumlist[0] <= -0.02:
 	while psumlist[0] <= -0.02:
 		Teff = Teff - 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -131,11 +137,10 @@ if psumlist[0] <= -0.02:
 elif psumlist[0] >= 0.02:
 	while psumlist[0] >= 0.02:
 		Teff = Teff + 10
-		if abs(Tefforig - Teff) >= 500:
-			sys.exit('{} failed model creation'.format(name))
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -149,9 +154,10 @@ else: print 'EP slope within tolerance'
 if psumlist[1] <= -0.02:
 	while psumlist[1] <= -0.02:
 		xi = xi - 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -162,9 +168,10 @@ if psumlist[1] <= -0.02:
 elif psumlist[1] >= 0.02:
 	while psumlist[1] >= 0.02:
 		xi = xi + 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -180,10 +187,10 @@ else: print 'RW slope within tolerance'
 if psumlist[0] <= -0.015:
 	while psumlist[0] <= -0.015:
 		Teff = Teff - 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -194,10 +201,10 @@ if psumlist[0] <= -0.015:
 elif psumlist[0] >= 0.015:
 	while psumlist[0] >= 0.015:
 		Teff = Teff + 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -211,9 +218,10 @@ else: print 'EP slope within tolerance'
 if psumlist[1] <= -0.015:
 	while psumlist[1] <= -0.015:
 		xi = xi - 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -224,9 +232,10 @@ if psumlist[1] <= -0.015:
 elif psumlist[1] >= 0.015:
 	while psumlist[1] >= 0.015:
 		xi = xi + 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -240,9 +249,9 @@ else: print 'RW slope within tolerance'
 if psumlist[2] <= -0.15:
 	while psumlist[2] <= -0.15:
 		logg = logg - 0.05
-		if abs(loggorig - logg) >= 1:
+		if abs(loggorig - logg) >= loggbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >1 dex, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -253,9 +262,9 @@ if psumlist[2] <= -0.15:
 elif psumlist[2] >= 0.15:
 	while psumlist[2] >= 0.15:
 		logg = logg + 0.05
-		if abs(loggorig - logg) >= 1:
+		if abs(loggorig - logg) >= loggbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >1 dex, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -271,10 +280,10 @@ else: print 'Fe I - Fe II within tolerance'
 if psumlist[0] <= -0.015:
 	while psumlist[0] <= -0.015:
 		Teff = Teff - 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -285,10 +294,10 @@ if psumlist[0] <= -0.015:
 elif psumlist[0] >= 0.015:
 	while psumlist[0] >= 0.015:
 		Teff = Teff + 10
-		if abs(Tefforig - Teff) >= 500:
+		if abs(Tefforig - Teff) >= Teffbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
 			pyclean(scriptloc)
-			sys.exit('\nRunaway-Phobos error: Teff altered by >500K, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: Teff altered by >{}K, please check EWs.\nParameters reset to photometric.'.format(Teffbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -302,9 +311,10 @@ else: print 'EP slope within tolerance'
 if psumlist[1] <= -0.015:
 	while psumlist[1] <= -0.015:
 		xi = xi - 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -315,9 +325,10 @@ if psumlist[1] <= -0.015:
 elif psumlist[1] >= 0.015:
 	while psumlist[1] >= 0.015:
 		xi = xi + 0.05
-		if abs(xiorig - xi) >= 1:
+		if abs(xiorig - xi) >= xibounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: microturbulence altered by >1 km/s, please check EWs.\nParameters reset to photometric.')
+			pyclean(scriptloc)
+			sys.exit('\nRunaway-Phobos error: microturbulence altered by >{} km/s, please check EWs.\nParameters reset to photometric.'.format(xibounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -331,9 +342,9 @@ else: print 'RW slope within tolerance'
 if psumlist[2] <= -0.1:
 	while psumlist[2] <= -0.1:
 		logg = logg - 0.05
-		if abs(loggorig - logg) >= 1:
+		if abs(loggorig - logg) >= loggbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >1 dex, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -344,9 +355,9 @@ if psumlist[2] <= -0.1:
 elif psumlist[2] >= 0.1:
 	while psumlist[2] >= 0.1:
 		logg = logg + 0.05
-		if abs(loggorig - logg) >= 1:
+		if abs(loggorig - logg) >= loggbounds:
 			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >1 dex, please check EWs.\nParameters reset to photometric.')
+			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
 		model(name,location,Teff,logg,xi,fe_h)
 		if not os.path.exists('models/{}.model.dat'.format(name)):
 			pyclean(scriptloc)
@@ -355,6 +366,10 @@ elif psumlist[2] >= 0.1:
 		psumlist = psum(name,Teff,logg,xi)
 		fe_h = psumlist[3] - 7.5
 else: print 'Fe I - Fe II within tolerance'
+
+#-- Recreates MOOG parameter with plotting activated.
+plotornot = 1
+moog(star,name,feelements,location,plotornot)
 
 #-- Display final parameters.
 print '\n\n\n\n\nPhobos succeeded for {n} (star {s}).'.format(n=name,s=star)
@@ -371,20 +386,6 @@ if not os.path.exists('backups/'):
 	os.mkdir('backups/')
 shutil.copy('moog_input/{}.fe.lines'.format(name),'backups/{}.fe.lines'.format(name))
 
-#-- Recreates MOOG parameter with plotting activated.
-with open('moog_parameters/{}'.format(star), 'w') as moog_param_file:
-    moog_param_file.write('abfind\n'\
-    'terminal     x11\n'\
-    'standard_out \'../moog_out1/{n}.out1\'\n'\
-    'summary_out  \'../moog_out2/{n}.out2\'\n'\
-    'model_in     \'../models/{n}.model.dat\'\n'\
-    'lines_in     \'../moog_input/{n}.{fee}.lines\'\n'\
-    'atmosphere 1\n'\
-    'molecules 0\n'\
-    'lines 1\n'\
-    'freeform 1\n'\
-    'flux/int 0\n'\
-    'damping 0\n'\
-    'plot 1'.format(n=name,fee=feelements,plotornot=plotornot))
+
 pyclean(scriptloc)
 sys.exit('\nParameter-Phobos has executed for {n} (star {s}), please consider a line check before running Phobos again.'.format(n=name,s=star))

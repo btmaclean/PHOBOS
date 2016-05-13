@@ -118,10 +118,16 @@ elif operation.lower().startswith('m'):
 	if operation.lower().startswith('s'):
 		model(name,location,Teff,logg,xi,fe_h)
 		pyclean(scriptloc)
+		feelements = 'fe'
+		plotornot = 1
+		moog(star,name,feelements,location,plotornot)
 		sys.exit('\nNew spectroscopic model created for {n} (star {s}).'.format(n=name,s=star))
 	elif operation.lower().startswith('p'):
 		photoreplace(name,location,Teff,logg,xi,fe_h,arrayelement)
 		pyclean(scriptloc)
+		feelements = 'fe'
+		plotornot = 1
+		moog(star,name,feelements,location,plotornot)
 		sys.exit('\nParameters for {n} (star {s}) reset to photometric, new model created.'.format(n=name,s=star))
 	else:
 		pyclean(scriptloc)

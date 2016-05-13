@@ -297,6 +297,8 @@ def psum(name,Teff,logg,xi):
                     EPslope.append(float(t))
                 except ValueError:
                     pass
+    if EPslope == []:
+        EPslope = '-'
     RWslope = []
     for line in open('moog_out2/{}.out2'.format(name)):
         if 'R.W. correlation' in line:
@@ -305,6 +307,8 @@ def psum(name,Teff,logg,xi):
                     RWslope.append(float(t))
                 except ValueError:
                     pass
+    if RWslope == []:
+        RWslope = '-'
     Iondiff = ablist[0] - ablist[3]
     psumlist = [EPslope[0],RWslope[0],Iondiff,ablist[0],ablist[1],int(ablist[2]),ablist[3],ablist[4],ablist[5]]
     print 'EP slope = {}'.format(EPslope[0])

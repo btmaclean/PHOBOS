@@ -7,10 +7,10 @@
 #-- Define location of analysis directory.
 location = '/Users/macleanb/data/ngc6397/analysis'
 #-- Define the two linelist files.
-linelist_fe = '/Users/macleanb/data/line_lists/fe.lines'
+linelist_fe = '/Users/macleanb/data/line_lists/fe_short.lines'
 linelist_elements = '/Users/macleanb/data/line_lists/nao.lines'
 #-- Choose prefered text editor launch command (e.g. gedit)
-texteditor = 'mate'
+texteditor = 'open'
 #-- Set initial estimate for metallicity ([Fe/H])
 fe_h = -2.02
 #-- Define distance modulus of cluster
