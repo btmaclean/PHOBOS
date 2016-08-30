@@ -19,6 +19,7 @@ from functions_phobos import pyclean
 from functions_phobos import purge
 from functions_phobos import photoreplace
 from functions_phobos import deletestar
+from functions_phobos import X_lines_summary
 
 scriptloc = os.path.dirname(sys.argv[0])
 
@@ -119,15 +120,17 @@ elif operation.lower().startswith('m'):
 		model(name,location,Teff,logg,xi,fe_h)
 		pyclean(scriptloc)
 		feelements = 'fe'
-		plotornot = 1
-		moog(star,name,feelements,location,plotornot)
+		if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
+			plotornot = 1
+			moog(star,name,feelements,location,plotornot)
 		sys.exit('\nNew spectroscopic model created for {n} (star {s}).'.format(n=name,s=star))
 	elif operation.lower().startswith('p'):
 		photoreplace(name,location,Teff,logg,xi,fe_h,arrayelement)
 		pyclean(scriptloc)
 		feelements = 'fe'
-		plotornot = 1
-		moog(star,name,feelements,location,plotornot)
+		if os.path.exists('{}/moog_input/{}.{}.lines'.format(location,name,feelements)):
+			plotornot = 1
+			moog(star,name,feelements,location,plotornot)
 		sys.exit('\nParameters for {n} (star {s}) reset to photometric, new model created.'.format(n=name,s=star))
 	else:
 		pyclean(scriptloc)

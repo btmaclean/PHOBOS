@@ -9,15 +9,23 @@ if not os.path.exists('moog_input/'):
 if not os.path.exists('backups/'):
     os.mkdir('backups/')
 
-#-- Set metallicity to the value determined by Fe-Phobos, or last Parameter-Phobos run.
-psumlist = psum(name,Teff,logg,xi)
-fe_h = psumlist[3] - 7.5
+#-- Set metallicity to the value determined last Parameter-Phobos run if done. If Fe never done for star, use default value set in user_variables file.
+if os.path.exists('moog_input/{}.fe.lines'.format(name)):
+    plotornot = 0
+    feelements = 'fe'
+    model(name,location,Teff,logg,xi,fe_h)
+    moog(star,name,feelements,location,plotornot)
+    psumlist = psum(name,Teff,logg,xi)
+    fe_h = psumlist[3] - 7.5
+    print '{}'.format(fe_h)
+    feelements = 'elements'
 
 if os.path.exists('moog_input/{}.elements.lines'.format(name)):
     print 'Moog_input line file already exists, running MOOG on input file.'
     plotornot = 0
     model(name,location,Teff,logg,xi,fe_h)
     moog(star,name,feelements,location,plotornot)
+    X_lines_summary(name,location,feelements)
     subprocess.Popen(['{}'.format(texteditor), 'moog_out2/{n}.out2'.format(n=name)])
     subprocess.Popen(['{}'.format(texteditor), 'moog_input/{n}.elements.lines'.format(n=name)])
     shutil.copy('moog_input/{}.elements.lines'.format(name),'backups/{}.elements.lines'.format(name))
@@ -48,10 +56,12 @@ ares(name,location,feelements,linelist_fe,linelist_elements)
 
 plotornot = 0
 moog(star,name,feelements,location,plotornot)
+X_lines_summary(name,location,feelements)
 
 #-- Opens the moog_output and moog_input line files in chosen.
 subprocess.Popen(['{}'.format(texteditor), 'moog_out2/{n}.out2'.format(n=name)])
 subprocess.Popen(['{}'.format(texteditor), 'moog_input/{n}.elements.lines'.format(n=name)])
+subprocess.Popen(['{}'.format(texteditor), '{}'.format(linelist_elements)])
 
 if not os.path.exists('backups/'):
     os.mkdir('backups/')

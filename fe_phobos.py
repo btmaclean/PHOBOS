@@ -35,6 +35,7 @@ ares(name,location,feelements,linelist_fe,linelist_elements)
 
 plotornot = 1
 moog(star,name,feelements,location,plotornot)
+X_lines_summary(name,location,feelements)
 
 #-- Opens the moog_output and moog_input line files in chosen.
 subprocess.Popen(['{}'.format(texteditor), '{}'.format(linelist_fe)])

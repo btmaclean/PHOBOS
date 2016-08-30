@@ -113,6 +113,9 @@ def ares(name,location,feelements,linelist_fe,linelist_elements):
         print '\nARES failed\n'
         print ares_out
     print '\nARES completed\n'
+    if os.path.getsize('{n}.{fee}.ares'.format(n=name,fee=feelements)) > 0:
+        with open('{n}.{fee}.ares'.format(n=name,fee=feelements), 'a') as toedit:
+            toedit.write('0\t0\t0\t0\t0\t0\t0\t0\t0')
     #-- Create blue MOOG input file
     final_array_blue = []
     if os.path.getsize('{}.{}.ares'.format(name,feelements)) > 0:
@@ -155,6 +158,9 @@ def ares(name,location,feelements,linelist_fe,linelist_elements):
         print '\nARES failed\n'
         print ares_out
     print '\nARES completed\n'
+    if os.path.getsize('{n}.{fee}.ares'.format(n=name,fee=feelements)) > 0:
+        with open('{n}.{fee}.ares'.format(n=name,fee=feelements), 'a') as toedit:
+            toedit.write('0\t0\t0\t0\t0\t0\t0\t0\t0')
     #-- Create green/red/ir MOOG input file
     final_array_grir = []
     if os.path.getsize('{}.{}.ares'.format(name,feelements)) > 0:
@@ -205,7 +211,7 @@ def ares(name,location,feelements,linelist_fe,linelist_elements):
     final_array_63_1 = final_array_pre[final_array_pre[:,1] == 63.1]
     final_array = np.vstack((final_array_26_0,final_array_26_1,final_array_3_0,final_array_6_0,final_array_8_0,final_array_11_0,final_array_12_0,final_array_13_0,final_array_14_0,final_array_19_0,final_array_20_0,final_array_21_0,final_array_21_1,final_array_22_0,final_array_22_1,final_array_23_0,final_array_24_0,final_array_24_1,final_array_25_0,final_array_27_0,final_array_28_0,final_array_29_0,final_array_30_0,final_array_37_0,final_array_38_0,final_array_39_0,final_array_40_0,final_array_44_0,final_array_56_1,final_array_57_1,final_array_58_1,final_array_60_1,final_array_63_1))
     #-- Print to file
-    np.savetxt('{}/moog_input/{}.{}.lines'.format(location,name,feelements), final_array, fmt='%.2f\t%.1f\t%.3f\t%.3f\t%.0f\t%.0f\t%.2f', newline='\n', header=' ')
+    np.savetxt('{}/moog_input/{}.{}.lines'.format(location,name,feelements), final_array, fmt='%.2f\t%.1f\t%.3f\t%.3f\t%.0f\t%.0f\t%.2f', newline='\n', header='\t0\t0\t')
     if os.path.exists('mine.opt'):
         os.remove('mine.opt')
     if os.path.exists('logARES.txt'):
@@ -358,4 +364,101 @@ def create_photom_params(location,fe_h,dist_mod,colour_scale):
         photo_params.append([name, Teff, logg, xi])
     np.savetxt('photo.params', photo_params, fmt='%s', newline='\n')
     return
+
+#-------------- X LINE ABUNDANCE SUMMARY ----------------------------#
+#-- Pull EWs/individual abunds from moog_out2 based on element.lines
+def X_lines_summary(name,location,feelements):
+    import numpy as np
+    import os
+    os.chdir(location)
+    if not os.path.exists('X_line_abundance_summaries/'):
+    	os.mkdir('X_line_abundance_summaries/')
+    if not os.path.exists('X_line_abundance_summaries/{}'.format(name)):
+        os.mkdir('X_line_abundance_summaries/{}'.format(name))
+    #-- Get lines used on star and cross reference with moog_out2 to create a numpy array row for each absorption line.
+    wavelengths = np.loadtxt('moog_input/{}.{}.lines'.format(name,feelements),dtype=None)
+    wavelengths = wavelengths[:,[0]]
+    temp = []
+    for row in np.nditer(wavelengths):
+        for line in open('moog_out2/{}.out2'.format(name)):
+            if '{}'.format(row) in line:
+                temp.append(line)
+    np.savetxt('temp.txt', temp, fmt='%s')
+    temp = np.loadtxt('temp.txt',dtype=None)
+    os.remove('temp.txt')
+    #-- Function to create summary file if element was measured in moog_out2.
+    def create_X_summary_file(temp_element, element_name):
+        if np.size(temp_element) != 0:
+            temp_element = temp_element[:,[0,4,6]]
+            np.savetxt('X_line_abundance_summaries/{}/{}_lines.summary'.format(name,element_name), temp_element, fmt='%s', newline='\n', header='Wavelength\tEW\tLTE_abundance', delimiter='\t')
+        return
+    #-- Run through every element that might be measured separately.
+    FeI = temp[temp[:,1] == 26.0]
+    create_X_summary_file(FeI, 'FeI')
+    FeII = temp[temp[:,1] == 26.1]
+    create_X_summary_file(FeII, 'FeII')
+    L = temp[temp[:,1] == 3.0]
+    create_X_summary_file(L, 'L')
+    C = temp[temp[:,1] == 6.0]
+    create_X_summary_file(C, 'C')
+    O = temp[temp[:,1] == 8.0]
+    create_X_summary_file(O, 'O')
+    Na = temp[temp[:,1] == 11.0]
+    create_X_summary_file(Na, 'Na')
+    Mg = temp[temp[:,1] == 12.0]
+    create_X_summary_file(Mg, 'Mg')
+    Al = temp[temp[:,1] == 13.0]
+    create_X_summary_file(Al, 'Al')
+    Si = temp[temp[:,1] == 14.0]
+    create_X_summary_file(Si, 'Si')
+    K = temp[temp[:,1] == 19.0]
+    create_X_summary_file(K, 'K')
+    Ca = temp[temp[:,1] == 20.0]
+    create_X_summary_file(Ca, 'Ca')
+    ScI = temp[temp[:,1] == 21.0]
+    create_X_summary_file(ScI, 'ScI')
+    ScII = temp[temp[:,1] == 21.1]
+    create_X_summary_file(ScII, 'ScII')
+    TiI = temp[temp[:,1] == 22.0]
+    create_X_summary_file(TiI, 'TiI')
+    TiII = temp[temp[:,1] == 22.1]
+    create_X_summary_file(TiII, 'TiII')
+    V = temp[temp[:,1] == 23.0]
+    create_X_summary_file(V, 'V')
+    CrI = temp[temp[:,1] == 24.0]
+    create_X_summary_file(CrI, 'CrI')
+    CrII = temp[temp[:,1] == 24.1]
+    create_X_summary_file(CrII, 'CrII')
+    Mn = temp[temp[:,1] == 25.0]
+    create_X_summary_file(Mn, 'Mn')
+    Co = temp[temp[:,1] == 27.0]
+    create_X_summary_file(Co, 'Co')
+    Ni = temp[temp[:,1] == 28.0]
+    create_X_summary_file(Ni, 'Ni')
+    Cu = temp[temp[:,1] == 29.0]
+    create_X_summary_file(Cu, 'Cu')
+    Zn = temp[temp[:,1] == 30.0]
+    create_X_summary_file(Zn, 'Zn')
+    Rb = temp[temp[:,1] == 37.0]
+    create_X_summary_file(Rb, 'Rb')
+    Sr = temp[temp[:,1] == 38.0]
+    create_X_summary_file(Sr, 'Sr')
+    Y = temp[temp[:,1] == 39.0]
+    create_X_summary_file(Y, 'Y')
+    Zr = temp[temp[:,1] == 40.0]
+    create_X_summary_file(Zr, 'Zr')
+    Ru = temp[temp[:,1] == 44.0]
+    create_X_summary_file(Ru, 'Ru')
+    BaII = temp[temp[:,1] == 56.1]
+    create_X_summary_file(BaII, 'BaII')
+    LaII = temp[temp[:,1] == 57.1]
+    create_X_summary_file(LaII, 'LaII')
+    CeII = temp[temp[:,1] == 58.1]
+    create_X_summary_file(CeII, 'CeII')
+    NdII = temp[temp[:,1] == 60.1]
+    create_X_summary_file(NdII, 'NdII')
+    EuII = temp[temp[:,1] == 63.1]
+    create_X_summary_file(EuII, 'EuII')
+    return
+
 

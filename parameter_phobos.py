@@ -246,33 +246,36 @@ elif psumlist[1] >= 0.015:
 else: print 'RW slope within tolerance'
 
 #-- logg
-if psumlist[2] <= -0.15:
-	while psumlist[2] <= -0.15:
-		logg = logg - 0.05
-		if abs(loggorig - logg) >= loggbounds:
-			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
-		model(name,location,Teff,logg,xi,fe_h)
-		if not os.path.exists('models/{}.model.dat'.format(name)):
-			pyclean(scriptloc)
-			sys.exit('{} failed model creation'.format(name))
-		moog(star,name,feelements,location,plotornot) 
-		psumlist = psum(name,Teff,logg,xi)
-		fe_h = psumlist[3] - 7.5
-elif psumlist[2] >= 0.15:
-	while psumlist[2] >= 0.15:
-		logg = logg + 0.05
-		if abs(loggorig - logg) >= loggbounds:
-			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
-		model(name,location,Teff,logg,xi,fe_h)
-		if not os.path.exists('models/{}.model.dat'.format(name)):
-			pyclean(scriptloc)
-			sys.exit('{} failed model creation'.format(name))
-		moog(star,name,feelements,location,plotornot) 
-		psumlist = psum(name,Teff,logg,xi)
-		fe_h = psumlist[3] - 7.5
-else: print 'Fe I - Fe II within tolerance'
+if 'AGB' in name:
+	print 'AGB star. Skipping ionization balance'
+else:
+	if psumlist[2] <= -0.15:
+		while psumlist[2] <= -0.15:
+			logg = logg - 0.05
+			if abs(loggorig - logg) >= loggbounds:
+				resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
+				sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
+			model(name,location,Teff,logg,xi,fe_h)
+			if not os.path.exists('models/{}.model.dat'.format(name)):
+				pyclean(scriptloc)
+				sys.exit('{} failed model creation'.format(name))
+			moog(star,name,feelements,location,plotornot) 
+			psumlist = psum(name,Teff,logg,xi)
+			fe_h = psumlist[3] - 7.5
+	elif psumlist[2] >= 0.15:
+		while psumlist[2] >= 0.15:
+			logg = logg + 0.05
+			if abs(loggorig - logg) >= loggbounds:
+				resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
+				sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
+			model(name,location,Teff,logg,xi,fe_h)
+			if not os.path.exists('models/{}.model.dat'.format(name)):
+				pyclean(scriptloc)
+				sys.exit('{} failed model creation'.format(name))
+			moog(star,name,feelements,location,plotornot) 
+			psumlist = psum(name,Teff,logg,xi)
+			fe_h = psumlist[3] - 7.5
+	else: print 'Fe I - Fe II within tolerance'
 
 #-- Take 4 (with logg, slope tolerance 0.015, psumlist[2] tolerance 0.1 dex)
 
@@ -339,37 +342,41 @@ elif psumlist[1] >= 0.015:
 else: print 'RW slope within tolerance'
 
 #-- logg
-if psumlist[2] <= -0.1:
-	while psumlist[2] <= -0.1:
-		logg = logg - 0.05
-		if abs(loggorig - logg) >= loggbounds:
-			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
-		model(name,location,Teff,logg,xi,fe_h)
-		if not os.path.exists('models/{}.model.dat'.format(name)):
-			pyclean(scriptloc)
-			sys.exit('{} failed model creation'.format(name))
-		moog(star,name,feelements,location,plotornot) 
-		psumlist = psum(name,Teff,logg,xi)
-		fe_h = psumlist[3] - 7.5
-elif psumlist[2] >= 0.1:
-	while psumlist[2] >= 0.1:
-		logg = logg + 0.05
-		if abs(loggorig - logg) >= loggbounds:
-			resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
-			sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
-		model(name,location,Teff,logg,xi,fe_h)
-		if not os.path.exists('models/{}.model.dat'.format(name)):
-			pyclean(scriptloc)
-			sys.exit('{} failed model creation'.format(name))
-		moog(star,name,feelements,location,plotornot) 
-		psumlist = psum(name,Teff,logg,xi)
-		fe_h = psumlist[3] - 7.5
-else: print 'Fe I - Fe II within tolerance'
+if 'AGB' in name:
+	print 'AGB star. Skipping ionization balance'
+else:
+	if psumlist[2] <= -0.1:
+		while psumlist[2] <= -0.1:
+			logg = logg - 0.05
+			if abs(loggorig - logg) >= loggbounds:
+				resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
+				sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
+			model(name,location,Teff,logg,xi,fe_h)
+			if not os.path.exists('models/{}.model.dat'.format(name)):
+				pyclean(scriptloc)
+				sys.exit('{} failed model creation'.format(name))
+			moog(star,name,feelements,location,plotornot) 
+			psumlist = psum(name,Teff,logg,xi)
+			fe_h = psumlist[3] - 7.5
+	elif psumlist[2] >= 0.1:
+		while psumlist[2] >= 0.1:
+			logg = logg + 0.05
+			if abs(loggorig - logg) >= loggbounds:
+				resetparamstoorig(name,location,Teff,Tefforig,logg,loggorig,xi,xiorig,fe_h,star,feelements)
+				sys.exit('\nRunaway-Phobos error: log(g) altered by >{} dex, please check EWs.\nParameters reset to photometric.'.format(loggbounds))
+			model(name,location,Teff,logg,xi,fe_h)
+			if not os.path.exists('models/{}.model.dat'.format(name)):
+				pyclean(scriptloc)
+				sys.exit('{} failed model creation'.format(name))
+			moog(star,name,feelements,location,plotornot) 
+			psumlist = psum(name,Teff,logg,xi)
+			fe_h = psumlist[3] - 7.5
+	else: print 'Fe I - Fe II within tolerance'
 
 #-- Recreates MOOG parameter with plotting activated.
 plotornot = 1
 moog(star,name,feelements,location,plotornot)
+X_lines_summary(name,location,feelements)
 
 #-- Display final parameters.
 print '\n\n\n\n\nPhobos succeeded for {n} (star {s}).'.format(n=name,s=star)
