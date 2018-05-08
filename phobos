@@ -10,6 +10,8 @@ import os
 import shutil
 import sys
 import subprocess
+import math
+from scipy import stats
 from functions_phobos import moog
 from functions_phobos import model
 from functions_phobos import ares
@@ -22,6 +24,86 @@ from functions_phobos import deletestar
 from functions_phobos import X_lines_summary
 
 scriptloc = os.path.dirname(sys.argv[0])
+print scriptloc
+#print "THIS IS EDITED!!!!!"
+
+cluster = raw_input('\nPlease specify which cluster you would like to Phobos [m4][6397]: ')
+if cluster.lower() == 'm4':
+	print '\nCluster: Messier 4'
+	with open('/Users/macleanb/observational_software/scripts/phobos/user_variables.py', 'w') as user_var:
+		user_var.write('#!/usr/local/bin/python\n'\
+		'\n'\
+		'#--------------- USER VARIABLES ------------------#\n'\
+		'\n'\
+		'#-------------------------------------------------#\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-- Define location of analysis directory.\n'\
+		'location = "/Users/macleanb/data/m4/m4_members/analysis"\n'\
+		'#-- Define the two linelist files.\n'\
+		'linelist_fe = "/Users/macleanb/data/line_lists/fe_short.lines"\n'\
+		'linelist_elements = "/Users/macleanb/data/line_lists/nao.lines"\n'\
+		'#-- Choose prefered text editor launch command (e.g. gedit)\n'\
+		'texteditor = "mate"\n'\
+		'#-- Set initial estimate for metallicity ([Fe/H])\n'\
+		'fe_h = -1.15\n'\
+		'#-- Define distance modulus of cluster\n'\
+		'dist_mod = 12.82\n'\
+		'#-- Define colour scale in photometry (options: BV, VJ, VK, VH, by)\n'\
+		'colour_scale = "VK"\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-------------------------------------------------#')
+elif cluster.lower() == '6397':
+	print '\nCluster: NGC 6397'
+	with open('/Users/macleanb/observational_software/scripts/phobos/user_variables.py', 'w') as user_var:
+		user_var.write('#!/usr/local/bin/python\n'\
+		'\n'\
+		'#--------------- USER VARIABLES ------------------#\n'\
+		'\n'\
+		'#-------------------------------------------------#\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-- Define location of analysis directory.\n'\
+		'location = "/Users/macleanb/data/ngc6397/analysis"\n'\
+		'#-- Define the two linelist files.\n'\
+		'linelist_fe = "/Users/macleanb/data/line_lists/fe_short.lines"\n'\
+		'linelist_elements = "/Users/macleanb/data/line_lists/nao.lines"\n'\
+		'#-- Choose prefered text editor launch command (e.g. gedit)\n'\
+		'texteditor = "mate"\n'\
+		'#-- Set initial estimate for metallicity ([Fe/H])\n'\
+		'fe_h = -2.02\n'\
+		'#-- Define distance modulus of cluster\n'\
+		'dist_mod = 12.37\n'\
+		'#-- Define colour scale in photometry (options: BV, VJ, VK, VH, by)\n'\
+		'colour_scale = "VK"\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-------------------------------------------------#')
+elif cluster.lower() == 'fab':
+	print '\nCluster: M4'
+	with open('/Users/macleanb/observational_software/scripts/phobos/user_variables.py', 'w') as user_var:
+		user_var.write('#!/usr/local/bin/python\n'\
+		'\n'\
+		'#--------------- USER VARIABLES ------------------#\n'\
+		'\n'\
+		'#-------------------------------------------------#\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-- Define location of analysis directory.\n'\
+		'location = "/Users/macleanb/data/m4/fabiola"\n'\
+		'#-- Define the two linelist files.\n'\
+		'linelist_fe = "/Users/macleanb/data/line_lists/fe_short.lines"\n'\
+		'linelist_elements = "/Users/macleanb/data/line_lists/nao.lines"\n'\
+		'#-- Choose prefered text editor launch command (e.g. gedit)\n'\
+		'texteditor = "mate"\n'\
+		'#-- Set initial estimate for metallicity ([Fe/H])\n'\
+		'fe_h = -1.15\n'\
+		'#-- Define distance modulus of cluster\n'\
+		'dist_mod = 12.82\n'\
+		'#-- Define colour scale in photometry (options: BV, VJ, VK, VH, by)\n'\
+		'colour_scale = "VK"\n'\
+		'#--------------- USER TO DEFINE ------------------#\n'\
+		'#-------------------------------------------------#')
+else:
+	cluster = 'm4'
+	pyclean(scriptloc)
+	sys.exit('\nUnknown cluster, please add details to:\n{}/user_variables.py\nand options to:\n{}/phobos'.format(scriptloc,scriptloc))
 
 #-- Load use defined variables: location, linelists and text editor.
 execfile('{}/user_variables.py'.format(scriptloc))
@@ -41,29 +123,38 @@ except:
 	pyclean(scriptloc)
 	sys.exit('\nCluster metallicity ([Fe/H]) must be a float.')
 
-print '\nPhobos code files: {}\nAnalysis directory: {}\nIron line list: {}\nElemental line list: {}\nText Editor: {}\nCluster metallicity estimate: [Fe/H] = {}\nCluster distance modulus: {}\nPhotometry colour: {}'.format(scriptloc,location,linelist_fe,linelist_elements,texteditor,fe_h,dist_mod,colour_scale)
+print '\n[Fe/H] ~ {}'.format(fe_h)
+print 'M-m = {}'.format(dist_mod)
+print 'Analysis directory: {}'.format(location)
+
+print '\nPhobos code files: {}'.format(scriptloc)
+print 'Iron line list: {}'.format(linelist_fe)
+print 'Elemental line list: {}'.format(linelist_elements)
+print 'Text Editor: {}'.format(texteditor)
+print 'Photometry colour: {}'.format(colour_scale)
+
 
 #-- Go to analysis directory.
 os.chdir(location)
 
 #-- Check for /fits and photometry.txt in analysis directory, and exit if not found.
-if not os.path.exists('{}/fits'.format(location)):
-	pyclean(scriptloc)
-	sys.exit('\n"/fits" folder does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
+#if not os.path.exists('{}/fits'.format(location)):
+#	pyclean(scriptloc)
+#	sys.exit('\n"/fits" folder does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
 
-if not os.path.exists('{}/photometry.txt'.format(location)):
-	pyclean(scriptloc)
-	sys.exit('\n"photometry.txt" does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
+#if not os.path.exists('{}/photometry.txt'.format(location)):
+#	pyclean(scriptloc)
+#	sys.exit('\n"photometry.txt" does not exist in Analysis directory! Exiting Phobos.'.format(linelist_elements))
 
 #-- Create photometric parameter list if it doesn't exist yet.
-if not os.path.exists('photo.params'):
-	print 'Creating photo.params from photometry.txt'
-	create_photom_params(location,fe_h,dist_mod,colour_scale)
+#if not os.path.exists('photo.params'):
+#	print 'Creating photo.params from photometry.txt'
+#	create_photom_params(location,fe_h,dist_mod,colour_scale)
 
 #-- Create spectroscopic parameter list if it doesn't exist yet.
-if not os.path.exists('spectro.params'):
-	print 'Creating spectro.params from photo.params'
-	shutil.copy('photo.params','spectro.params')
+#if not os.path.exists('spectro.params'):
+#	print 'Creating spectro.params from photo.params'
+#	shutil.copy('photo.params','spectro.params')
 
 #-- Ask user which star to use (ie. 1-50).
 star = raw_input('\nPlease specify which number star you would like to Phobos (i.e. 1 to n, where n is the total number of stars): ')
@@ -98,18 +189,19 @@ name = params[arrayelement][0]
 Teff = int(params[arrayelement][1])
 logg = params[arrayelement][2]
 xi = params[arrayelement][3]
+Vmag = params[arrayelement][4]
 
 #-- Ask user what to do.
-operation = raw_input('\nWhat would you like to do?\n Parameter/Fe analysis [p][f],\n Elemental abundance determination [e],\n Make a new model [m],\n Delete a stellar analysis [del], or\n Purge analysis folder [PURGE]?\n ')
+operation = raw_input('\nWhat would you like to do?\n Fe analysis [f],\n Spectroscopic parameter analysis [p],\n Elemental abundance determination [e],\n Make a new model [m],\n Delete a stellar analysis [del], or\n Purge analysis folder [PURGE]?\n ')
 
 if operation.lower().startswith('f'):
-	print '\nRunning Parameter-Phobos.'
+	print '\nRunning Fe-Phobos.'
 	feelements = 'fe'
-	execfile('{}/parameter_phobos.py'.format(scriptloc))
+	execfile('{}/fe_phobos.py'.format(scriptloc))
 elif operation.lower() == 'p':
 	print '\nRunning Parameter-Phobos.'
 	feelements = 'fe'
-	execfile('{}/parameter_phobos.py'.format(scriptloc))
+	execfile('{}/parameter_phobos_new.py'.format(scriptloc))
 elif operation.lower().startswith('e'):
 	print '\nRunning Elemental-Phobos.'
 	feelements = 'elements'

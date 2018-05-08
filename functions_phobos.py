@@ -224,6 +224,7 @@ def ares(name,location,feelements,linelist_fe,linelist_elements):
 def model(name,location,Teff,logg,xi,fe_h):
     import os
     import subprocess
+    FNULL = open(os.devnull, 'w')
     #-- Go to appropriate directory.
     os.chdir(location)
     if not os.path.exists('models/'):
@@ -235,7 +236,7 @@ def model(name,location,Teff,logg,xi,fe_h):
     if os.path.exists('{}.model.dat'.format(name)):
         os.remove('{}.model.dat'.format(name))
     #-- Depending on the parameters Teff and logg, a model is created with Castelli using an input grid that covers the parameters.
-    subprocess.Popen(['makekurucz3'], stdin=subprocess.PIPE).communicate(input='{},{},{},{}\nAODFNEW'.format(Teff,logg,fe_h,xi))
+    subprocess.Popen(['makekurucz3'], stdin=subprocess.PIPE, stdout=FNULL, stderr=subprocess.STDOUT).communicate(input='{},{},{},{}\nAODFNEW'.format(Teff,logg,fe_h,xi))
     #-- Remove temp files and rename model.
     os.rename('FINALMODEL', '{}.model.dat'.format(name))
     os.chdir(location)
@@ -246,6 +247,7 @@ def model(name,location,Teff,logg,xi,fe_h):
 def moog(star,name,feelements,location,plotornot):
     import os
     import subprocess
+    FNULL = open(os.devnull, 'w')
     #-- Go to appropriate directory.
     os.chdir(location)
     if not os.path.exists('moog_out1/'):
@@ -280,13 +282,14 @@ def moog(star,name,feelements,location,plotornot):
         'damping 0\n'\
         'plot {plotornot}'.format(n=name,fee=feelements,plotornot=plotornot))
     #-- Runs MOOG using the moog_input line file.
-    subprocess.Popen(['MOOG'], stdin=subprocess.PIPE).communicate(input='\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'.format(star))
+    subprocess.Popen(['MOOG'], stdin=subprocess.PIPE, stdout=FNULL, stderr=subprocess.STDOUT).communicate(input='\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'.format(star))
     os.chdir(location)
     return
 
 #-------------- PARAMETER SUMMARY ----------------------------#
 #-- Create arrays: 'ablist' that contains an abundance value or stdev in each element; 'EPslope' and 'RWslope' which contain each value for FeI and FeII; and 'Iondiff' which specifies FeI-FeII.
 def psum(name,Teff,logg,xi):
+    import os
     ablist = []
     for line in open('moog_out2/{}.out2'.format(name)):
         if 'average abundance' in line:
@@ -317,6 +320,8 @@ def psum(name,Teff,logg,xi):
         RWslope = '-'
     Iondiff = ablist[0] - ablist[3]
     psumlist = [EPslope[0],RWslope[0],Iondiff,ablist[0],ablist[1],int(ablist[2]),ablist[3],ablist[4],ablist[5]]
+    os.system('clear')
+    print 'Star = {}'.format(name)
     print 'EP slope = {}'.format(EPslope[0])
     print 'RW slope = {}'.format(RWslope[0])
     print 'FeI-FeII = {}'.format(Iondiff)
@@ -325,6 +330,7 @@ def psum(name,Teff,logg,xi):
     print 'xi = {}'.format(xi)
     print 'FeI = {} +/- {} ({})'.format(ablist[0],ablist[1],int(ablist[2]))
     print 'FeII = {} +/- {} ({})'.format(ablist[3],ablist[4],int(ablist[5]))
+    #print '\n{} {} {} {}'.format(ablist[0],ablist[1],ablist[3],ablist[4])
     return psumlist
 
 #-------------- CREATE PHOTOMETRIC PARAMETER FILE ----------------------------#

@@ -24,7 +24,7 @@ ARES (v2, http://www.astro.up.pt/~sousasag/ares/)
 -gsl
 -OpenMP
 
-makekurucz3 (*reference?*)
+makekurucz3 (Andy Casey)
 
 Python (at least v2.7)
 -numpy
